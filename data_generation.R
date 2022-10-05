@@ -217,12 +217,27 @@ biobank_cnv_data = cnv_ukb_reference_v2_20190626 %>%
 biobank_cnv_data$CN = ifelse(biobank_cnv_data$CN == "+", "duplication", "deletion")
 
 biobank_cnv_data= biobank_cnv_data[,2:8]
-biobank_cnv_data$LENGTH = (as.numeric(biobank_cnv_data$END) - as.numeric(biobank_cnv_data$START)) + 1
+biobank_cnv_data$LENGTH = round((as.numeric(biobank_cnv_data$END) - (as.numeric(biobank_cnv_data$START) -1))/1000000,4)
 
 #filter for CNVs >50kb
 biobank_cnv_data = biobank_cnv_data[biobank_cnv_data$LENGTH > 50000,]
 biobank_cnv_data$CHR = paste0("chr",  biobank_cnv_data$CHR)
 
+
+#save data per chromosome
+ukb_cnv_list = list()
+for(i in unique(biobank_cnv_data$CHR)) {
+  cnv_data = biobank_cnv_data[biobank_cnv_data$CHR == i,]
+  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd","Type", "Allele count","N_ALL", "Allele frequency", "Size (Mb")
+  cnv_data = cnv_data[,c(1:4,8,5,7)]
+  ukb_cnv_list[[i]] = cnv_data
+}
+
+saveRDS(ukb_cnv_list, file = "processed_data/ukb_cnv_list.RDS") 
+ukb_cnv_list <- readRDS("processed_data/ukb_cnv_list.RDS")
+
+
+#save freq of windows
 ukb_freq_list = list()
 
 for(i in 1:22){
@@ -283,6 +298,24 @@ gnomad_v2_1_sv_sites$LENGTH =  gnomad_v2_1_sv_sites$end - gnomad_v2_1_sv_sites$s
 #filter for CNVs >50kb
 gnomad_v2_1_sv_sites = gnomad_v2_1_sv_sites[gnomad_v2_1_sv_sites$LENGTH > 50000,]
 
+
+#save data per chromosome
+gnomad_v2_1_sv_sites$LENGTH = round((as.numeric(gnomad_v2_1_sv_sites$end) - (as.numeric(gnomad_v2_1_sv_sites$start) -1))/1000000,4)
+
+gnomad_cnv_list = list()
+for(i in unique(gnomad_v2_1_sv_sites$"#chrom")) {
+  cnv_data = gnomad_v2_1_sv_sites[gnomad_v2_1_sv_sites$"#chrom" == i,]
+  cnv_data$AF = as.numeric(cnv_data$AF)
+  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd", "Allele count", "Allele frequency","Type", "Size (Mb")
+  cnv_data$chrom= paste0("chr",cnv_data$chrom)
+  cnv_data = cnv_data[,c(1:3,6,7,4,5)]
+  gnomad_cnv_list[[i]] = cnv_data
+}
+
+saveRDS(gnomad_cnv_list, file = "processed_data/gnomad_cnv_list.RDS") 
+gnomad_cnv_list <- readRDS("processed_data/gnomad_cnv_list.RDS")
+
+#save frequency in window
 gnomad_freq_list = list()
 
 for(i in unique(gnomad_v2_1_sv_sites$`#chrom`)){
@@ -341,7 +374,7 @@ gnomad_freq_list <- readRDS("processed_data/gnomad_freq_list.RDS")
 
 ##### ClinVar data ####
 
-# file from clinvar is to large, please download here: https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz
+# file from clinvar is too large, please download here: https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz
 # and add file to the data folder (working directory)
 
 variant_summary <- read_delim("variant_summary_160121.txt", 
