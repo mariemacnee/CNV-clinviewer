@@ -1020,6 +1020,30 @@ server <- function(input, output, session) {
         ranges$x <- c(brush$xmin, brush$xmax)
     })
     
+    
+     observeEvent(input$submit_region, {
+    #   if(str_detect(input$submit_region,"-")){
+    #   inputregion = trimws(inputregion)
+       start = as.numeric(str_split(input$inputregion,"-", simplify=T)[1])
+       stop = as.numeric(str_split(input$inputregion,"-", simplify=T)[2])
+       
+       chr_data = data$cytoBand_hg19[data$cytoBand_hg19$chrom == ranges$chr, ]
+       chr_start = min(chr_data$chromStart)
+       chr_end = max(chr_data$chromEnd)
+      if(chr_start <= start & chr_end > start){
+          if(chr_start < stop & chr_end >= stop){
+           ranges$x <- c(start, stop)
+           }
+      } else {
+         showModal(modalDialog(
+           p("Please select a valid region with the following syntax: 8000000-1200000")
+           ,footer = tagList(
+            modalButton("OK"),
+           )
+         ))
+       }
+    })
+    
     zoomed_range <- reactive({
       if (!is.null(event_data("plotly_brushed"))){
         xmin <- event_data("plotly_brushed")$x[1]

@@ -220,7 +220,12 @@ ui = fluidPage(
                      column(width = 12,
                             textOutput("selected_region_ideogram"),
                             tags$head(tags$style("#selected_region_ideogram{font-size: 16px;font-weight: bold; color: #3c8dbc}")),
-                            withSpinner(plotOutput("ideogram", height = 100, brush = brushOpts(id = "ideogram_brush", resetOnNew = TRUE)))
+                            withSpinner(plotOutput("ideogram", height = 100, brush = brushOpts(id = "ideogram_brush", resetOnNew = TRUE))),
+                            #div(style = "display:inline-block; float:left",
+                            fluidRow(
+                                column(4, textInput("inputregion", "You can select a region on the plot or here by text (eg.: 129211608-130735581)",width='100%')),
+                                column(2, div( style = "margin-top: 25px;", actionButton("submit_region", "Submit region")))
+                            )
                             ),
                  #box(width=12,
                      column(width = 12,
