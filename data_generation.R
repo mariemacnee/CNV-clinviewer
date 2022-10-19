@@ -220,7 +220,7 @@ biobank_cnv_data= biobank_cnv_data[,2:8]
 biobank_cnv_data$LENGTH = round((as.numeric(biobank_cnv_data$END) - (as.numeric(biobank_cnv_data$START) -1))/1000000,4)
 
 #filter for CNVs >50kb
-biobank_cnv_data = biobank_cnv_data[biobank_cnv_data$LENGTH > 50000,]
+biobank_cnv_data = biobank_cnv_data[biobank_cnv_data$LENGTH >= 0.05,]
 biobank_cnv_data$CHR = paste0("chr",  biobank_cnv_data$CHR)
 
 
@@ -228,7 +228,7 @@ biobank_cnv_data$CHR = paste0("chr",  biobank_cnv_data$CHR)
 ukb_cnv_list = list()
 for(i in unique(biobank_cnv_data$CHR)) {
   cnv_data = biobank_cnv_data[biobank_cnv_data$CHR == i,]
-  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd","Type", "Allele count","N_ALL", "Allele frequency", "Size (Mb")
+  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd","Type", "Allele count","N_ALL", "Allele frequency", "Size (Mb)")
   cnv_data = cnv_data[,c(1:4,8,5,7)]
   ukb_cnv_list[[i]] = cnv_data
 }
@@ -306,10 +306,10 @@ gnomad_cnv_list = list()
 for(i in unique(gnomad_v2_1_sv_sites$"#chrom")) {
   cnv_data = gnomad_v2_1_sv_sites[gnomad_v2_1_sv_sites$"#chrom" == i,]
   cnv_data$AF = as.numeric(cnv_data$AF)
-  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd", "Allele count", "Allele frequency","Type", "Size (Mb")
+  names(cnv_data) = c("chrom" , "chromStart",  "chromEnd", "Allele count", "Allele frequency","Type", "Size (Mb)")
   cnv_data$chrom= paste0("chr",cnv_data$chrom)
   cnv_data = cnv_data[,c(1:3,6,7,4,5)]
-  gnomad_cnv_list[[i]] = cnv_data
+  gnomad_cnv_list[[paste0('chr',i)]] = cnv_data
 }
 
 saveRDS(gnomad_cnv_list, file = "processed_data/gnomad_cnv_list.RDS") 

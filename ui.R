@@ -148,7 +148,7 @@ ui = fluidPage(
                         column(width =12,
                                br(),
                                tags$hr(),
-                               fluidRow(p("The content on this website is based on version March 10, 2022", align = "center")))
+                               fluidRow(p("The content on this website is based on version October 19, 2022", align = "center")))
     ), #close tabpanel
     
     ########################### PANEL 2  ########################### 
@@ -223,7 +223,7 @@ ui = fluidPage(
                             withSpinner(plotOutput("ideogram", height = 100, brush = brushOpts(id = "ideogram_brush", resetOnNew = TRUE))),
                             #div(style = "display:inline-block; float:left",
                             fluidRow(
-                                column(4, textInput("inputregion", "You can select a region on the plot or here by text (eg.: 129211608-130735581)",width='100%')),
+                                column(4, textInput("inputregion", "You can select a region in the plot or specify your boundaries here (eg.: 129211608-130735581)",width='100%')),
                                 column(2, div( style = "margin-top: 25px;", actionButton("submit_region", "Submit region")))
                             )
                             ),
@@ -341,32 +341,91 @@ ui = fluidPage(
                                                              #hr(),
                                                              withSpinner(dataTableOutput("clinvar_table", height= "100%")),
                                                              p("ClinVar version: 16 January 2022"),
-                                                             downloadButton("download_clinvar", label = "Download ClinVar table", class = "btn-s", color="primary")
+                                                             downloadButton("download_clinvar", label = "Download ClinVar CNV table", class = "btn-s", color="primary")
                                                     ))
                                         )), #close well panel and box
+                              box(title = strong("Microdeletion and microduplication syndromes from DECIPHER", style = "font-size: 18px"),
+                                  width = 12, solidHeader = T, status = "primary", #status = "navy", 
+                                  collapsed = FALSE, collapsible=TRUE,
+                                  wellPanel(style= "border-color: #aaaaaa; background-color: #ffffff; border-radius: 5px; font-size: 110%",
+                                            tabsetPanel(type = "tabs",
+                                                        tabPanel("Plot of intersecting syndromes",
+                                                                 column(width=12,
+                                                                        div(style = "display:inline-block; float:right",  
+                                                                            actionLink("moveleft_more10", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                            actionLink("moveleft10", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
+                                                                            actionLink("moveright10", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
+                                                                            actionLink("moveright_more10", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                            actionLink("zoom_in10", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                            actionLink("zoom_out10", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                            actionLink("zoom_back10", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
+                                                                        )),
+                                                                 br(),
+                                                                 withSpinner(plotlyOutput("decipher_plot", height= 150)),
+                                                                 column(width=2, offset=10,  align = "right",plotOutput("cnv_legend8", height = 50)),
+                                                                 br(),br()
+                                                        ))
+                                  )), #close well panel and box
                               #hr(),
                               #strong("CNV allele frequency from 482,734 individuals in the UK Biobank (filtered for CNVs > 50kb)", style = "font-size: 18px"),
                               #wellPanel(style= "border-color: #aaaaaa; background-color: #ffffff; border-radius: 5px; font-size: 110%",
                                         
-                              box(title = strong("CNV allele frequency from 482,734 individuals in the UK Biobank (filtered for CNVs > 50kb)", style = "font-size: 18px"),
+                              box(title = strong("CNV allele frequency from 482,734 individuals in the UK-Biobank (filtered for CNVs > 50kb)", style = "font-size: 18px"),
                                   width = 12, solidHeader = T, status = "primary", #status = "navy", 
                                   collapsed = FALSE, collapsible=TRUE,
                                   wellPanel(style= "border-color: #aaaaaa; background-color: #ffffff; border-radius: 5px; font-size: 110%",
-                                            column(width=12,
-                                                   div(style = "display:inline-block; float:right",  
-                                                       actionLink("moveleft_more6", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveleft6", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveright6", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveright_more6", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("zoom_in6", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
-                                                       actionLink("zoom_out6", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
-                                                       actionLink("zoom_back6", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
-                                                   )),
-                                            br(),
-                                        withSpinner(plotlyOutput("ukb_plot_summary", height= 250)),
-                                        column(width=2, offset=10,  align = "right",plotOutput("cnv_legend4", height = 50)),
-                                        p("UK Biobank data v2")
-                                        )), #close well panel and box
+                                            tabsetPanel(type = "tabs",
+                                                        tabPanel("CNV allele frequency",
+                                                        column(width=12,
+                                                               div(style = "display:inline-block; float:right",  
+                                                                   actionLink("moveleft_more6", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                   actionLink("moveleft6", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
+                                                                   actionLink("moveright6", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
+                                                                   actionLink("moveright_more6", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                   actionLink("zoom_in6", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                   actionLink("zoom_out6", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                   actionLink("zoom_back6", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
+                                                               )),
+                                                        br(),
+                                                    withSpinner(plotlyOutput("ukb_plot_summary", height= 250)),
+                                                    column(width=2, offset=10,  align = "right", plotOutput("cnv_legend4", height = 50)),
+                                                    p("UK Biobank data v2")
+                                                    ),
+                                                    tabPanel("CNV plot and table"
+                                                             ,
+                                                             br(),
+                                                             column(width=12,
+                                                                    div(style = "display:inline-block; float:right",
+                                                                        actionLink("moveleft_more8", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                        actionLink("moveleft8", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
+                                                                        actionLink("moveright8", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
+                                                                        actionLink("moveright_more8", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                        actionLink("zoom_in8", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                        actionLink("zoom_out8", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                        actionLink("zoom_back8", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
+                                                                    ))
+                                                             ,
+                                                             br(),
+                                                             htmlOutput("ukb_cnv_number"),
+                                                             br(),
+                                                             textOutput("ukb_cnv_number_1"),
+                                                             br(),
+                                                             withSpinner(plotlyOutput("ukb_plot1", height= "100%")),
+                                                             br(),
+                                                             textOutput("ukb_cnv_number_2"),
+                                                             br(),
+                                                             withSpinner(plotlyOutput("ukb_plot2", height= "100%")),
+                                                             column(width=2, offset=10,  align = "right",plotOutput("cnv_legend6", height = 50)),
+                                                             # br(),
+                                                             # uiOutput("ukb_filter_ui", height= "100%"),
+                                                             br(),
+                                                             #hr(),
+                                                             withSpinner(dataTableOutput("ukb_table", height= "100%")),
+                                                             p("UK-Biobank CNVs version: v2"),
+                                                             downloadButton("download_ukb", label = "Download UK-Biobank CNV table", class = "btn-s", color="primary")
+                                                    )
+                                                    ) #close tabset panel 
+                                  )),#close well panel and box
                               #hr(),
                               #strong("CNV allele frequency from 14,891 genomes (gnomAD; filtered for CNVs > 50kb)", style = "font-size: 18px"),
                               box(title = strong("CNV allele frequency from 14,891 genomes (gnomAD; filtered for CNVs > 50kb)", style = "font-size: 18px"),
@@ -374,20 +433,57 @@ ui = fluidPage(
                                   collapsed = FALSE, collapsible=TRUE,
                                   
                                   wellPanel(style= "border-color: #aaaaaa; background-color: #ffffff; border-radius: 5px; font-size: 110%",
-                                            column(width=12,
-                                                   div(style = "display:inline-block; float:right",  
-                                                       actionLink("moveleft_more7", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveleft7", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveright7", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("moveright_more7", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
-                                                       actionLink("zoom_in7", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
-                                                       actionLink("zoom_out7", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
-                                                       actionLink("zoom_back7", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
-                                                   )),
-                                            br(),
-                                        withSpinner(plotlyOutput("gnomad_plot_summary", height= 250)),
-                                        column(width=2, offset=10,  align = "right",plotOutput("cnv_legend5", height = 50)),
-                                        p("GnomAD SV data v2.1")
+                                            tabsetPanel(type = "tabs",
+                                                        tabPanel("CNV allele frequency",
+                                                                  column(width=12,
+                                                                         div(style = "display:inline-block; float:right",  
+                                                                             actionLink("moveleft_more7", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                             actionLink("moveleft7", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
+                                                                             actionLink("moveright7", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
+                                                                             actionLink("moveright_more7", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                             actionLink("zoom_in7", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                             actionLink("zoom_out7", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                             actionLink("zoom_back7", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
+                                                                         )),
+                                                                  br(),
+                                                                withSpinner(plotlyOutput("gnomad_plot_summary", height= 250)),
+                                                                column(width=2, offset=10,  align = "right",plotOutput("cnv_legend5", height = 50)),
+                                                                p("GnomAD SV data v2.1")
+                                                      ),
+                                                      tabPanel("CNV plot and table"
+                                                               ,
+                                                               br(),
+                                                               column(width=12,
+                                                                      div(style = "display:inline-block; float:right",
+                                                                          actionLink("moveleft_more9", "", icon = icon("angle-double-left"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                          actionLink("moveleft9", "", icon = icon("angle-left"), "50%", style='padding:4px; font-size:90%; color:black'),
+                                                                          actionLink("moveright9", "", icon = icon("angle-right"),"50%", style='padding:4px; font-size:90%; color:black'),
+                                                                          actionLink("moveright_more9", "", icon = icon("angle-double-right"), "95%", style='padding:4px; font-size:90%; color:black'),
+                                                                          actionLink("zoom_in9", "Zoom in", icon = icon("search-plus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                          actionLink("zoom_out9", "Zoom out", icon = icon("search-minus"), "2x", style='padding:4px; font-size:100%; color:black'),
+                                                                          actionLink("zoom_back9", "Back to CNV", icon = icon("undo-alt"), style='padding:4px; font-size:100%; color:black')
+                                                                      ))
+                                                               ,
+                                                               br(),
+                                                               htmlOutput("gnomad_cnv_number"),
+                                                               br(),
+                                                               textOutput("gnomad_cnv_number_1"),
+                                                               br(),
+                                                               withSpinner(plotlyOutput("gnomad_plot1", height= "100%")),
+                                                               br(),
+                                                               textOutput("gnomad_cnv_number_2"),
+                                                               br(),
+                                                               withSpinner(plotlyOutput("gnomad_plot2", height= "100%")),
+                                                               column(width=2, offset=10,  align = "right",plotOutput("cnv_legend7", height = 50)),
+                                                               # br(),
+                                                               # uiOutput("gnomad_filter_ui", height= "100%"),
+                                                               br(),
+                                                               #hr(),
+                                                               withSpinner(dataTableOutput("gnomad_table", height= "100%")),
+                                                               p("GnomAD version: v2.1"),
+                                                               downloadButton("download_gnomad", label = "Download gnomAD table", class = "btn-s", color="primary")
+                                                      )
+                                            )
                                         ))  #close well panel and box
                             ))
                 # )#close box

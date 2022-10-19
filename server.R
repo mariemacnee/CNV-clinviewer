@@ -828,6 +828,7 @@ server <- function(input, output, session) {
   filtered_decipher_syndromes <- reactive({
     req(!is.null(ranges$x))
     decipher_syndromes = intersect_table(data$decipher_syndromes, ranges)
+    decipher_syndromes = decipher_syndromes[!is.na(decipher_syndromes$start),]
     decipher_syndromes
   })
   
@@ -952,26 +953,26 @@ server <- function(input, output, session) {
     })
     
     
-    observeEvent(input$zoom_out | input$zoom_out2 | input$zoom_out3 | input$zoom_out4 | input$zoom_out5 | input$zoom_out6 | input$zoom_out7, {
+    observeEvent(input$zoom_out | input$zoom_out2 | input$zoom_out3 | input$zoom_out4 | input$zoom_out5 | input$zoom_out6 | input$zoom_out7 | input$zoom_out8 | input$zoom_out9 | input$zoom_out10, {
       length = ranges$x[2] - ranges$x[1]
       chr_length= max(data$cytoBand_hg19[data$cytoBand_hg19$chrom == ranges$chr, "chromEnd"])
       ranges$x[1] = max(1, ranges$x[1] - (length/2))
       ranges$x[2] = min(chr_length, ranges$x[2] + (length/2))
     }, ignoreInit = TRUE)
     
-    observeEvent(input$zoom_in | input$zoom_in2 | input$zoom_in3 | input$zoom_in4 | input$zoom_in5| input$zoom_in6 | input$zoom_in7, {
+    observeEvent(input$zoom_in | input$zoom_in2 | input$zoom_in3 | input$zoom_in4 | input$zoom_in5| input$zoom_in6 | input$zoom_in7| input$zoom_in8 | input$zoom_in9 | input$zoom_in10, {
       length = ranges$x[2] - ranges$x[1]
       chr_length= max(data$cytoBand_hg19[data$cytoBand_hg19$chrom == ranges$chr, "chromEnd"])
       ranges$x[1] = ranges$x[1] + (length/4)
       ranges$x[2] = ranges$x[2] - (length/4)
     }, ignoreInit = TRUE)
     
-    observeEvent(input$zoom_back |  input$zoom_back2 |  input$zoom_back3|  input$zoom_back4|  input$zoom_back5|  input$zoom_back6|  input$zoom_back7, {
+    observeEvent(input$zoom_back |  input$zoom_back2 |  input$zoom_back3|  input$zoom_back4|  input$zoom_back5|  input$zoom_back6|  input$zoom_back7| input$zoom_back8 | input$zoom_back9 | input$zoom_back10, {
       ranges$x[1] = as.numeric(c(uploaded_cnvs$table[input$classify_table_rows_selected, "START"]))
       ranges$x[2] = as.numeric(c(uploaded_cnvs$table[input$classify_table_rows_selected, "END"]))
     })
     
-    observeEvent(input$moveleft |input$moveleft2 |input$moveleft3 |input$moveleft4 |input$moveleft5 |input$moveleft6 |input$moveleft7, {
+    observeEvent(input$moveleft |input$moveleft2 |input$moveleft3 |input$moveleft4 |input$moveleft5 |input$moveleft6 |input$moveleft7| input$moveleft8 | input$moveleft9 | input$moveleft10, {
       length = ranges$x[2] - ranges$x[1]
       move_length = round(length*0.5, digits=0)
       
@@ -980,7 +981,7 @@ server <- function(input, output, session) {
 
     }, ignoreInit = TRUE)
     
-    observeEvent(input$moveleft_more| input$moveleft_more2 |input$moveleft_more3 |input$moveleft_more4 |input$moveleft_more5 |input$moveleft_more6 |input$moveleft_more7, {
+    observeEvent(input$moveleft_more| input$moveleft_more2 |input$moveleft_more3 |input$moveleft_more4 |input$moveleft_more5 |input$moveleft_more6 |input$moveleft_more7| input$moveleft_more8 | input$moveleft_more9 | input$moveleft10, {
       
       length = ranges$x[2] - ranges$x[1]
       move_length = round(length*0.95, digits=0)
@@ -991,7 +992,7 @@ server <- function(input, output, session) {
     }, ignoreInit = TRUE)
     
     
-    observeEvent(input$moveright | input$moveright2 | input$moveright3| input$moveright4| input$moveright5| input$moveright6| input$moveright7, {
+    observeEvent(input$moveright | input$moveright2 | input$moveright3| input$moveright4| input$moveright5| input$moveright6| input$moveright7| input$moveright8 | input$moveright9 | input$moveright10, {
 
       length = ranges$x[2] - ranges$x[1]
       move_length = round(length*0.5, digits=0)
@@ -1002,7 +1003,7 @@ server <- function(input, output, session) {
 
     }, ignoreInit = TRUE)
 
-    observeEvent(input$moveright_more| input$moveright_more2|input$moveright_more3|input$moveright_more4|input$moveright_more5|input$moveright_more6|input$moveright_more7, {
+    observeEvent(input$moveright_more| input$moveright_more2|input$moveright_more3|input$moveright_more4|input$moveright_more5|input$moveright_more6|input$moveright_more7| input$moveright_more8 | input$moveright_more9 | input$moveright_more10, {
 
       length = ranges$x[2] - ranges$x[1]
       move_length = round(length*0.95, digits=0)
@@ -1602,6 +1603,49 @@ server <- function(input, output, session) {
             geom_text(aes(label=text), hjust=-0.4, color="black")+
             theme(legend.position = "none")
         })
+        
+        output$cnv_legend6 = renderPlot({
+          req(!is.null(ranges$x))
+          
+          legend <- data.frame(x=c(1,15), y=c(1, 1), text=c("Deletion", "Duplication"))
+          ggplot(legend, aes(x=x, y=y, color=text))+
+            geom_point(size = 6)+
+            scale_color_manual(values = c("#cd0c18","#1660a7"))+
+            ylim(c(0,2))+
+            xlim(c(0,30))+
+            theme_void()+
+            geom_text(aes(label=text), hjust=-0.4, color="black")+
+            theme(legend.position = "none")
+        })
+        
+        output$cnv_legend7 = renderPlot({
+          req(!is.null(ranges$x))
+          
+          legend <- data.frame(x=c(1,15), y=c(1, 1), text=c("Deletion", "Duplication"))
+          ggplot(legend, aes(x=x, y=y, color=text))+
+            geom_point(size = 6)+
+            scale_color_manual(values = c("#cd0c18","#1660a7"))+
+            ylim(c(0,2))+
+            xlim(c(0,30))+
+            theme_void()+
+            geom_text(aes(label=text), hjust=-0.4, color="black")+
+            theme(legend.position = "none")
+        })
+        
+        output$cnv_legend8 = renderPlot({
+          req(!is.null(ranges$x))
+          
+          legend <- data.frame(x=c(1,15), y=c(1, 1), text=c("Deletion", "Duplication"))
+          ggplot(legend, aes(x=x, y=y, color=text))+
+            geom_point(size = 6)+
+            scale_color_manual(values = c("#cd0c18","#1660a7"))+
+            ylim(c(0,2))+
+            xlim(c(0,30))+
+            theme_void()+
+            geom_text(aes(label=text), hjust=-0.4, color="black")+
+            theme(legend.position = "none")
+        })
+        
     
     ##### CLINVAR summary ####
    clinvar_data_summary <- reactive({ 
@@ -1924,7 +1968,55 @@ server <- function(input, output, session) {
          )
        }) 
      
+    ##### DECIPHER plot ####
+   
+   output$decipher_plot <- renderPlotly({ 
      
+     req(!is.null(ranges$x))
+     validate(need(nrow(filtered_decipher_syndromes())>0, "There are no expert-curated microdeletion and microduplication syndromes involved in developmental disorders from DECIPHER that intersect the selected region."))
+     
+     
+     filtered_decipher_syndromes = filtered_decipher_syndromes()
+     filtered_decipher_syndromes$color = ifelse(filtered_decipher_syndromes$Type == "Deletion", 'rgb(205, 12, 24)', 'rgb(22, 96, 167)')
+       
+     cnv_upload_fig <- plot_ly()
+
+     for (i in 1:nrow(filtered_decipher_syndromes)){
+       
+       cnv_upload_fig <- add_trace(cnv_upload_fig,
+                                   x = c(max(filtered_decipher_syndromes$start[i], ranges$x[1]), min(filtered_decipher_syndromes$end[i], ranges$x[2])), 
+                                   y = c(i, i),  
+                                   mode = "lines",
+                                   type = "scatter",
+                                   line = list(color = filtered_decipher_syndromes$color[i], width = 5),
+                                   showlegend = F,
+                                   hoverinfo = "text",
+                                   text = paste0("CNV: ", filtered_decipher_syndromes$Type[i], "<br>",
+                                                 "Position: ", filtered_decipher_syndromes$start[i], "-", filtered_decipher_syndromes$end[i], "<br>",
+                                                 "Syndrome: ", filtered_decipher_syndromes$Syndrome[i], "<br>",
+                                                 "Phenotype: ",filtered_decipher_syndromes$Phenotypes[i]))
+     }
+     
+     cnv_upload_fig <- cnv_upload_fig %>% layout(xaxis = list(title = 'Genomic Position (Mb)',
+                                                              range = c(ranges$x[1],ranges$x[2])),
+                                                 yaxis = list(title = "",
+                                                              zeroline = FALSE,
+                                                              showline = FALSE,
+                                                              showticklabels = FALSE,
+                                                              showgrid = FALSE,
+                                                              fixedrange = TRUE),
+                                                 height= 100 + (nrow(filtered_decipher_syndromes) * 8),
+                                                 margin=list(t = 50, b = 20),
+                                                 dragmode = "select",
+                                                 selectdirection = "h",
+                                                 font = list(family = "Arial"))%>%
+       event_register(event = "plotly_brushed") %>%
+       config(displaylogo = FALSE, displayModeBar = FALSE)
+     
+     toWebGL(cnv_upload_fig)
+   })
+   
+   
     ##### UKB summary ####
    ukb_data_summary <- reactive({ 
      req(!is.null(ranges$chr))
@@ -1976,7 +2068,199 @@ server <- function(input, output, session) {
        toWebGL(plot) 
    })
    
+   #ukb CNV plots
+   ukb_data_list <- reactiveValues(ukb_data1=NULL, ukb_data2=NULL)
+
+   ukb_data <- observe({
+     req(!is.null(ranges$chr))
+     ukb_data = data$ukb_cnv_list[[ranges$chr]]
+     ukb_data = intersect_table(ukb_data, ranges)
+
+     ukb_data$PLOT_START = ifelse(ukb_data$start <= ranges$x[1], ranges$x[1], ukb_data$start)
+     ukb_data$PLOT_END = ifelse(ukb_data$end >= ranges$x[2], ranges$x[2], ukb_data$end)
+
+     ukb_data$color <- ifelse(ukb_data$Type == "deletion", 'rgb(205, 12, 24)', 'rgb(22, 96, 167)')
+     ukb_data <- ukb_data[order(ukb_data$Type, -ukb_data$PLOT_START),]
+
+     ukb_data_list$ukb_data <- ukb_data
+     ukb_data_list$ukb_data1 <- ukb_data[ukb_data$Type == "deletion", ]
+     ukb_data_list$ukb_data2 <- ukb_data[ukb_data$Type == "duplication", ]
+   })
+
+   output$ukb_plot1 = renderPlotly(
+
+     if(!is.null(ukb_data_list$ukb_data1)){
+
+       ukb_data1 = ukb_data_list$ukb_data1
+       #validate(need(nrow(ukb_data1) < 200, "There are too many UK-Biobank deletions in this region to display. Please select a smaller region or filter the CNVs."))
+
+       if(nrow(ukb_data1)>100){
+         ukb_data1 = ukb_data1[1:100,]
+       }
+
+       validate(need(nrow(ukb_data1) > 0, "No UK-Biobank deletions in this region."))
+
+       cnv_fig1 <- plot_ly()
+       for (i in 1:nrow(ukb_data1)){
+         cnv_fig1 <- add_trace(cnv_fig1,
+                               x = c(ukb_data1$PLOT_START[i], ukb_data1$PLOT_END[i]),  # x0, x1
+                               y = c(i, i),  # y0, y1
+                               mode = "lines",
+                               type = "scatter",
+                               line = list(color = ukb_data1$color[i], width = 2),
+                               showlegend = F,
+                               hoverinfo = "text",
+
+                               # Create custom hover text
+                               text = paste("Type: ", ukb_data1$Type[i], "<br>",
+                                            "Chromosome: ", ukb_data1$chrom[i], "<br>",
+                                            "Position: ", ukb_data1$start[i], "-", ukb_data1$end[i], "<br>",
+                                            "Size (Mb): ", ukb_data1$`Size (Mb)`[i], "<br>",
+                                            "% in region:", round(ukb_data1$percentage_inregion[i],2))
+         )}
+
+       cnv_fig1 = cnv_fig1  %>% layout(xaxis = list(title = 'Genomic Position (Mb)',
+                                                    range = c(ranges$x[1],ranges$x[2])),
+                                       yaxis = list(title = "",
+                                                    zeroline = FALSE,
+                                                    showline = FALSE,
+                                                    showticklabels = FALSE,
+                                                    showgrid = FALSE,
+                                                    fixedrange = TRUE),
+                                       margin=list(t = 50, b = 20),
+                                       font = list(family = "Arial"),
+                                       height= 100+(nrow(ukb_data1) * 5),
+                                       dragmode = "select",
+                                       selectdirection = "h") %>%
+         event_register(event = "plotly_brushed") %>%
+         config(displaylogo = FALSE, displayModeBar = FALSE)
+
+       toWebGL(cnv_fig1)
+
+     }
+   )
+
+   output$ukb_plot2 = renderPlotly(
+
+     if(!is.null(ukb_data_list$ukb_data2)){
+
+       ukb_data2 = ukb_data_list$ukb_data2
+       #validate(need(nrow(ukb_data2) < 200, "There are too many ukb CNVs in this region to display. Please select a smaller region or filter the CNVs."))
+       validate(need(nrow(ukb_data2) > 0, "No UK-Biobank duplications in this region."))
+
+       if(nrow(ukb_data2)>100){
+         ukb_data2 = ukb_data2[1:100,]
+       }
+
+       cnv_fig2 <- plot_ly()
+       for (i in 1:nrow(ukb_data2)){
+         cnv_fig2 <- add_trace(cnv_fig2,
+                               x = c(ukb_data2$PLOT_START[i], ukb_data2$PLOT_END[i]),  # x0, x1
+                               y = c(i, i),  # y0, y1
+                               mode = "lines",
+                               type = "scatter",
+                               line = list(color = ukb_data2$color[i], width = 2),
+                               showlegend = F,
+                               hoverinfo = "text",
+
+                               # Create custom hover text
+                               text = paste("Type: ", ukb_data2$Type[i], "<br>",
+                                            "Chromosome: ", ukb_data2$chrom[i], "<br>",
+                                            "Position: ", ukb_data2$start[i], "-", ukb_data2$end[i], "<br>",
+                                            "Size (Mb): ", ukb_data2$`Size (Mb)`[i], "<br>",
+                                            "% in region:", round(ukb_data2$percentage_inregion[i],2))
+         )}
+
+       cnv_fig2 = cnv_fig2  %>%
+         layout(xaxis = list(title = 'Genomic Position (Mb)',
+                             range = c(ranges$x[1],ranges$x[2])),
+                yaxis = list(title = "",
+                             zeroline = FALSE,
+                             showline = FALSE,
+                             showticklabels = FALSE,
+                             showgrid = FALSE,
+                             fixedrange = TRUE),
+                margin=list(t = 50, b = 20),
+                font = list(family = "Arial"),
+                height= 100+(nrow(ukb_data2) * 5),
+                dragmode = "select",
+                selectdirection = "h") %>%
+         event_register(event = "plotly_brushed") %>%
+         config(displaylogo = FALSE, displayModeBar = FALSE)
+
+       toWebGL(cnv_fig2)
+
+     }
+   )
+   
+
+   ukb_tabledata = reactive({
+     if(!is.null(ukb_data_list$ukb_data)){
+
+       ukb_data <-  ukb_data_list$ukb_data
+       ukb_data <- ukb_data[order(ukb_data$percentage_inregion, decreasing = T),]
+
+       ukb_data = ukb_data %>%
+         dplyr::select(chrom, start, end, `Size (Mb)`, percentage_inregion, Type, `Allele count`, `Allele frequency`) %>%
+         mutate(percentage_inregion = round(percentage_inregion ,2)) %>%
+         dplyr::rename(Chromosome = chrom) %>%
+         dplyr::rename(Start = start) %>%
+         dplyr::rename(End = end) %>%
+         dplyr::rename(`% in region` = percentage_inregion)
+     }
+     ukb_data
+
+   })
+
+   output$ukb_table = renderDataTable({
+
+     req(!is.null(ukb_tabledata()))
+
+     ukb_tabledata <- ukb_tabledata() %>%
+       dplyr::select(Chromosome, Start, End, `Size (Mb)`, `% in region`, Type,  `Allele count`, `Allele frequency`)
+
+     ukb_tabledata
+
+   }, escape = FALSE,
+   filter = 'top',
+   rownames = FALSE,
+   options = list(paging = FALSE, scrollY= "250px", scrollCollapse = TRUE, dom = 't',
+                  columnDefs = list(list(className = 'dt-center', targets = "_all")))
+   )
+
+
+   output$download_ukb <- downloadHandler(
+
+     req(!is.null(ukb_tabledata())),
+
+     filename = function() {
+       paste0('ukb_cnvs_',ranges$chr,"_",ranges$x[1],"-",ranges$x[2],'.tsv')
+     },
+     content = function(con) {
+       write.table(ukb_tabledata(), con, quote = FALSE, sep = "\t", row.names = FALSE)
+     }
+   )
+
+
+
+   output$ukb_cnv_number <- renderText({
+     req(!is.null(ranges$x))
+     paste0("<b>UK-Biobank CNVs (n= ",nrow(ukb_data_list$ukb_data),")</b>")
+   })
+
+   output$ukb_cnv_number_1 <- renderText({
+     req(!is.null(ranges$x))
+     paste0("Deletions (n= ",nrow(ukb_data_list$ukb_data1) ,")")
+   })
+
+   output$ukb_cnv_number_2 <- renderText({
+     req(!is.null(ranges$x))
+     paste0("Duplications (n= ",nrow(ukb_data_list$ukb_data2) ,")")
+   })
+
+   
     ##### GnomAD summary ####
+   
    gnomad_data_summary <- reactive({ 
      req(!is.null(ranges$chr))
      gnomad_data_summary_data = data$gnomad_freq_list[[ranges$chr]]
@@ -2021,7 +2305,197 @@ server <- function(input, output, session) {
      
      toWebGL(plot) 
    })
-  
+   
+   gnomad_data_list <- reactiveValues(gnomad_data1=NULL, gnomad_data2=NULL)
+
+   gnomad_data <- observe({
+     req(!is.null(ranges$chr))
+     gnomad_data = data$gnomad_cnv_list[[ranges$chr]]
+     gnomad_data = intersect_table(gnomad_data, ranges)
+
+     gnomad_data$PLOT_START = ifelse(gnomad_data$start <= ranges$x[1], ranges$x[1], gnomad_data$start)
+     gnomad_data$PLOT_END = ifelse(gnomad_data$end >= ranges$x[2], ranges$x[2], gnomad_data$end)
+
+     gnomad_data$color <- ifelse(gnomad_data$Type == "DEL", 'rgb(205, 12, 24)', 'rgb(22, 96, 167)')
+     gnomad_data <- gnomad_data[order(gnomad_data$Type, -gnomad_data$PLOT_START),]
+
+     gnomad_data_list$gnomad_data <- gnomad_data
+     gnomad_data_list$gnomad_data1 <- gnomad_data[gnomad_data$Type == "DEL", ]
+     gnomad_data_list$gnomad_data2 <- gnomad_data[gnomad_data$Type == "DUP", ]
+   })
+
+   output$gnomad_plot1 = renderPlotly(
+
+     if(!is.null(gnomad_data_list$gnomad_data1)){
+
+       gnomad_data1 = gnomad_data_list$gnomad_data1
+       #validate(need(nrow(gnomad_data1) < 200, "There are too many gnomAD deletions in this region to display. Please select a smaller region or filter the CNVs."))
+
+       if(nrow(gnomad_data1)>100){
+         gnomad_data1 = gnomad_data1[1:100,]
+       }
+
+       validate(need(nrow(gnomad_data1) > 0, "No gnomAD deletions in this region."))
+
+       cnv_fig1 <- plot_ly()
+       for (i in 1:nrow(gnomad_data1)){
+         cnv_fig1 <- add_trace(cnv_fig1,
+                               x = c(gnomad_data1$PLOT_START[i], gnomad_data1$PLOT_END[i]),  # x0, x1
+                               y = c(i, i),  # y0, y1
+                               mode = "lines",
+                               type = "scatter",
+                               line = list(color = gnomad_data1$color[i], width = 2),
+                               showlegend = F,
+                               hoverinfo = "text",
+
+                               # Create custom hover text
+                               text = paste("Type: ", gnomad_data1$Type[i], "<br>",
+                                            "Chromosome: ", gnomad_data1$chrom[i], "<br>",
+                                            "Position: ", gnomad_data1$start[i], "-", gnomad_data1$end[i], "<br>",
+                                            "Size (Mb): ", gnomad_data1$`Size (Mb)`[i], "<br>",
+                                            "% in region:", round(gnomad_data1$percentage_inregion[i],2))
+         )}
+
+       cnv_fig1 = cnv_fig1  %>% layout(xaxis = list(title = 'Genomic Position (Mb)',
+                                                    range = c(ranges$x[1],ranges$x[2])),
+                                       yaxis = list(title = "",
+                                                    zeroline = FALSE,
+                                                    showline = FALSE,
+                                                    showticklabels = FALSE,
+                                                    showgrid = FALSE,
+                                                    fixedrange = TRUE),
+                                       margin=list(t = 50, b = 20),
+                                       font = list(family = "Arial"),
+                                       height= 100+(nrow(gnomad_data1) * 5),
+                                       dragmode = "select",
+                                       selectdirection = "h") %>%
+         event_register(event = "plotly_brushed") %>%
+         config(displaylogo = FALSE, displayModeBar = FALSE)
+
+       toWebGL(cnv_fig1)
+
+     }
+   )
+
+   output$gnomad_plot2 = renderPlotly(
+
+     if(!is.null(gnomad_data_list$gnomad_data2)){
+
+       gnomad_data2 = gnomad_data_list$gnomad_data2
+       #validate(need(nrow(gnomad_data2) < 200, "There are too many gnomad CNVs in this region to display. Please select a smaller region or filter the CNVs."))
+       validate(need(nrow(gnomad_data2) > 0, "No gnomAD duplications in this region."))
+
+       if(nrow(gnomad_data2)>100){
+         gnomad_data2 = gnomad_data2[1:100,]
+       }
+
+       cnv_fig2 <- plot_ly()
+       for (i in 1:nrow(gnomad_data2)){
+         cnv_fig2 <- add_trace(cnv_fig2,
+                               x = c(gnomad_data2$PLOT_START[i], gnomad_data2$PLOT_END[i]),  # x0, x1
+                               y = c(i, i),  # y0, y1
+                               mode = "lines",
+                               type = "scatter",
+                               line = list(color = gnomad_data2$color[i], width = 2),
+                               showlegend = F,
+                               hoverinfo = "text",
+
+                               # Create custom hover text
+                               text = paste("Type: ", gnomad_data2$Type[i], "<br>",
+                                            "Chromosome: ", gnomad_data2$chrom[i], "<br>",
+                                            "Position: ", gnomad_data2$start[i], "-", gnomad_data2$end[i], "<br>",
+                                            "Size (Mb): ", gnomad_data2$`Size (Mb)`[i], "<br>",
+                                            "% in region:", round(gnomad_data2$percentage_inregion[i],2))
+         )}
+
+       cnv_fig2 = cnv_fig2  %>%
+         layout(xaxis = list(title = 'Genomic Position (Mb)',
+                             range = c(ranges$x[1],ranges$x[2])),
+                yaxis = list(title = "",
+                             zeroline = FALSE,
+                             showline = FALSE,
+                             showticklabels = FALSE,
+                             showgrid = FALSE,
+                             fixedrange = TRUE),
+                margin=list(t = 50, b = 20),
+                font = list(family = "Arial"),
+                height= 100+(nrow(gnomad_data2) * 5),
+                dragmode = "select",
+                selectdirection = "h") %>%
+         event_register(event = "plotly_brushed") %>%
+         config(displaylogo = FALSE, displayModeBar = FALSE)
+
+       toWebGL(cnv_fig2)
+
+     }
+   )
+
+
+   gnomad_tabledata = reactive({
+     if(!is.null(gnomad_data_list$gnomad_data)){
+
+       gnomad_data <-  gnomad_data_list$gnomad_data
+       gnomad_data <- gnomad_data[order(gnomad_data$percentage_inregion, decreasing = T),]
+
+       gnomad_data = gnomad_data %>%
+         dplyr::select(chrom, start, end, `Size (Mb)`, percentage_inregion, Type, `Allele count`, `Allele frequency`) %>%
+         mutate(percentage_inregion = round(percentage_inregion ,2)) %>%
+         dplyr::rename(Chromosome = chrom) %>%
+         dplyr::rename(Start = start) %>%
+         dplyr::rename(End = end) %>%
+         dplyr::rename(`% in region` = percentage_inregion)
+     }
+     gnomad_data
+
+   })
+
+   output$gnomad_table = renderDataTable({
+
+     req(!is.null(gnomad_tabledata()))
+
+     gnomad_tabledata <- gnomad_tabledata() %>%
+       dplyr::select(Chromosome, Start, End, `Size (Mb)`, `% in region`, Type,  `Allele count`, `Allele frequency`)
+
+     gnomad_tabledata
+
+   }, escape = FALSE,
+   filter = 'top',
+   rownames = FALSE,
+   options = list(paging = FALSE, scrollY= "250px", scrollCollapse = TRUE, dom = 't',
+                  columnDefs = list(list(className = 'dt-center', targets = "_all")))
+   )
+
+
+   output$download_gnomad <- downloadHandler(
+
+     req(!is.null(gnomad_tabledata())),
+
+     filename = function() {
+       paste0('gnomad_cnvs_',ranges$chr,"_",ranges$x[1],"-",ranges$x[2],'.tsv')
+     },
+     content = function(con) {
+       write.table(gnomad_tabledata(), con, quote = FALSE, sep = "\t", row.names = FALSE)
+     }
+   )
+
+
+
+   output$gnomad_cnv_number <- renderText({
+     req(!is.null(ranges$x))
+     paste0("<b>gnomAD CNVs (n= ",nrow(gnomad_data_list$gnomad_data),")</b>")
+   })
+
+   output$gnomad_cnv_number_1 <- renderText({
+     req(!is.null(ranges$x))
+     paste0("Deletions (n= ",nrow(gnomad_data_list$gnomad_data1) ,")")
+   })
+
+   output$gnomad_cnv_number_2 <- renderText({
+     req(!is.null(ranges$x))
+     paste0("Duplications (n= ",nrow(gnomad_data_list$gnomad_data2) ,")")
+   })
+
+   
   ##### TABLES ######
    
    observeEvent(input$gene_table_help, {
@@ -2305,7 +2779,7 @@ server <- function(input, output, session) {
     output$enrichR_output_1 <- renderPlotly({
       req(!is.null(enriched1()))
         enriched1 = enriched1()
-        enriched1$color = ifelse(enriched1$Adjusted.P.value < 0.05, "#FF0000", "#D3D3D3")
+        enriched1$color = ifelse(enriched1$Adjusted.P.value < 0.05, "#CD0C18", "#D3D3D3")
         fig1 <- plot_ly(data = enriched1, x= ~log10_p, y=~Odds.Ratio,
                         type = "scatter",
                         mode = "markers",
@@ -2326,7 +2800,7 @@ server <- function(input, output, session) {
                    xref = "paper",
                    y0 = 0,
                    y1 = 1,
-                   line = list(color = "red", dash="dot"))
+                   line = list(color = "#CD0C18", dash="dot"))
                  )) %>% 
           config(displaylogo = FALSE, displayModeBar = FALSE)
         
@@ -2336,7 +2810,7 @@ server <- function(input, output, session) {
     output$enrichR_output_2 <- renderPlotly({
       req(!is.null(enriched2()))
         enriched2 = enriched2()
-        enriched2$color = ifelse(enriched2$Adjusted.P.value < 0.05, "#FF0000", "#D3D3D3")
+        enriched2$color = ifelse(enriched2$Adjusted.P.value < 0.05, "#CD0C18", "#D3D3D3")
         fig1 <- plot_ly(data = enriched2, x= ~log10_p, y=~Odds.Ratio,
                         type = "scatter",
                         mode = "markers",
@@ -2357,7 +2831,7 @@ server <- function(input, output, session) {
                    xref = "paper",
                    y0 = 0,
                    y1 = 1,
-                   line = list(color = "red", dash="dot")))
+                   line = list(color = "#CD0C18", dash="dot")))
           ) %>% 
           config(displaylogo = FALSE, displayModeBar = FALSE)
         
@@ -2386,7 +2860,7 @@ server <- function(input, output, session) {
                                       if (parseFloat(aData[2]) < 0.05)
                                       $("td:eq(2)", nRow).css("font-weight", "bold");
                                       if (parseFloat(aData[2]) < 0.05)
-                                      $("td:eq(2)", nRow).css("background-color", "#FF0000");}')
+                                      $("td:eq(2)", nRow).css("background-color", "#DF646B");}')
     ),
     caption = " "))
     
@@ -2411,7 +2885,7 @@ server <- function(input, output, session) {
                                       if (parseFloat(aData[2]) < 0.05)
                                       $("td:eq(2)", nRow).css("font-weight", "bold");
                                       if (parseFloat(aData[2]) < 0.05)
-                                      $("td:eq(2)", nRow).css("background-color", "#FF0000");}')
+                                      $("td:eq(2)", nRow).css("background-color", "#DF646B");}')
     ),
     caption = " "))
 
